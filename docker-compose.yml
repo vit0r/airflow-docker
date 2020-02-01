@@ -23,7 +23,7 @@ services:
         build: 
             context: .
             args: 
-                AIRFLOW_DEPS: "[postgres]"
+                #AIRFLOW_DEPS: "[postgres]"
                 PIP_PKGS_EXT: "pyndv"
         restart: always
         depends_on:

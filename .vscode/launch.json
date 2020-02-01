@@ -2,7 +2,7 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "up-airflow-sandbox",
+            "name": "up-airflow",
             "type": "python",
             "request": "launch",
             "args": ["up"],
@@ -10,12 +10,19 @@
             "preLaunchTask": "up-airflow"
         },
         {
-            "name": "down-airflow-sandbox",
+            "name": "down-airflow",
             "type": "python",
             "request": "launch",
             "args": ["down"],
             "program": "${workspaceFolder}/main.py",
             "preLaunchTask": "down-airflow"
+        },
+        {
+            "name": "update-folders",
+            "type": "python",
+            "request": "launch",
+            "args": ["${workspaceFolder}"],
+            "program": "${workspaceFolder}/update_folders.py",
         }
     ],
 }

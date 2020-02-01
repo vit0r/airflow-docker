@@ -6,25 +6,34 @@ ENV LANG en_US.UTF-8
 ENV LC_ALL en_US.UTF-8
 ENV LC_CTYPE en_US.UTF-8
 ENV LC_MESSAGES en_US.UTF-8
-ENV AIRFLOW_GPL_UNIDECODE=yes
+
 ENV SLUGIFY_USES_TEXT_UNIDECODE=yes
-ENV AIRFLOW_HOME=/usr/local/airflow
+ENV AIRFLOW_GPL_UNIDECODE=yes
 ENV AIRFLOW__CORE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:airflow@postgres:5432/airflow
 ENV AIRFLOW__CELERY__RESULT_BACKEND=db+postgresql://airflow:airflow@localhost:5432/airflow
+ENV AIRFLOW__CORE__EXECUTOR=LocalExecutor
 ENV AIRFLOW__CORE__LOAD_EXAMPLES=False
 ENV AIRFLOW__CORE__REMOTE_LOGGING=False
-ENV GOOGLE_APPLICATION_CREDENTIALS=/usr/local/airflow/.config/gcloud/application_default_credentials.json
+ENV AIRFLOW__SCHEDULER_CATCHUP_BY_DEFAULT=False
+
+ENV AIRFLOW_HOME=/usr/local/airflow
+ENV GCLOUD_CONFIGS=${AIRFLOW_HOME}/.config
+ENV GOOGLE_APPLICATION_CREDENTIALS=${GCLOUD_CONFIGS}/gcloud/application_default_credentials.json
+
 ARG DAGS_FOLDER
 ARG PLUGINS_FOLDER
 ARG AIRFLOW_VERSION
 ARG AIRFLOW_DEPS
 ARG PIP_PKGS_EXT
 ARG GCLOUD_INSTALL
-ARG GCLOUD_CONFIGS=${AIRFLOW_HOME}/.config/
 
 ENV AIRFLOW_VERSION_NUMBER=${AIRFLOW_VERSION}
 
 RUN useradd -ms /bin/bash -d ${AIRFLOW_HOME} airflow
+
+RUN mkdir -p ${GCLOUD_CONFIGS}
+
+RUN chown -R airflow: ${AIRFLOW_HOME}
 
 RUN set -ex \
     && buildDeps=' \
@@ -61,17 +70,17 @@ RUN set -ex \
         /usr/share/doc \
         /usr/share/doc-base
 
-RUN pip install --no-cache -U pip setuptools wheel pytz pyOpenSSL ndg-httpsclient \
- pyasn1 psycopg2-binary apache-airflow${AIRFLOW_DEPS}==${AIRFLOW_VERSION} ${PIP_PKGS_EXT}
+RUN pip install --no-cache -U pip setuptools wheel
+
+RUN pip install --no-cache pytz pyOpenSSL ndg-httpsclient pyasn1 psycopg2-binary
+
+RUN pip install --no-cache apache-airflow${AIRFLOW_DEPS}==${AIRFLOW_VERSION} ${PIP_PKGS_EXT}
 
 ADD ./entrypoint.sh /entrypoint.sh
+
 ADD ./install-gcloud-sdk.sh /install-gcloud-sdk.sh
 
-RUN mkdir -p ${GCLOUD_CONFIGS}
-
 RUN sh install-gcloud-sdk.sh ${GCLOUD_INSTALL}
-
-RUN chown -R airflow: ${AIRFLOW_HOME}
 
 EXPOSE 8080 5555 8793
 

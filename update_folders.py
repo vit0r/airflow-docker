@@ -33,7 +33,8 @@ def update_input_options(
     :return: None
     """
     print(f"find ... {folder_regex}")
-    folders = list(map(str, Path.glob(Path.home(), folder_regex)))
+    folders = list(map(str, Path.rglob(Path.home(), folder_regex)))
+    print(folders)
     tasks_file = VSCODE_TASK_PATH.open(mode="r")
     tasks_json = load(tasks_file)
     tasks_file.close()
@@ -47,8 +48,8 @@ def update_input_options(
 
 if __name__ == "__main__":
     try:
-        update_input_options("**/dags/", "dagsFolder", "options")
-        update_input_options("**/airflow-plugins/", "pluginsFolder")
+        update_input_options("**/dags", "dagsFolder", "options")
+        update_input_options("**/airflow-plugins", "pluginsFolder")
     except Exception as ex:
         sys.exit(1)
     finally:
