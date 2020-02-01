@@ -1,0 +1,81 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "down-airflow",
+      "type": "shell",
+      "command": "docker-compose -f ${workspaceFolder}/docker-compose.yml down"
+    },
+    {
+      "label": "rm-postgres",
+      "type": "shell",
+      "command": "sh ${workspaceFolder}/remove-postgres-before-up.sh"
+    },
+    {
+      "label": "search-for-dags-folders",
+      "type": "shell",
+      "command": "python3 ${workspaceFolder}/update_dags_folder_list.py ${workspaceFolder}"
+    },
+    {
+      "label": "up-airflow",
+      "type": "shell",
+      "command": "AIRFLOW_VERSION=${input:version} DAGS_FOLDER=${input:dagsFolder} PLUGINS_FOLDER=${input:pluginsFolder} docker-compose -f docker-compose.yml up -d --no-build --force-recreate",
+      "dependsOn": [
+        "rm-postgres",
+        "search-for-dags-folders",
+        "build-airflow"
+      ],
+      "presentation": {
+        "echo": true,
+        "reveal": "always",
+        "focus": true,
+        "panel": "new",
+        "showReuseMessage": true,
+        "clear": false
+      }
+    },
+    {
+      "label": "build-airflow",
+      "type": "shell",
+      "command": "docker-compose -f ${workspaceFolder}/docker-compose.yml build --build-arg DAGS_FOLDER --build-arg PLUGINS_FOLDER --build-arg AIRFLOW_VERSION=${input:version} --build-arg GCLOUD_INSTALL=${input:gcloudInstall}",
+    }
+  ],
+  "inputs": [
+    {
+      "id": "version",
+      "description": "Airflow version:",
+      "default": "1.10.2",
+      "type": "pickString",
+      "options": [
+        "1.10.2",
+        "1.10.3",
+        "1.10.4",
+        "1.10.5",
+        "1.10.6",
+        "1.10.7"
+      ]
+    },
+    {
+      "id": "gcloudInstall",
+      "description": "Install gcloud sdk?",
+      "default": "NO",
+      "type": "pickString",
+      "options": [
+        "YES",
+        "NO"
+      ]
+    },
+    {
+      "id": "dagsFolder",
+      "description": "Dags folder:",
+      "type": "pickString",
+      "options": []
+    },
+    {
+      "id": "pluginsFolder",
+      "description": "Plugins folder:",
+      "default": "/home/vit0r/airflow-plugins",
+      "type": "promptString"
+    }
+  ]
+}

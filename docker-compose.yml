@@ -1,0 +1,48 @@
+version: '3'
+services:
+    postgres:
+        image: postgres:9.6
+        container_name: postgres
+        environment:
+            - POSTGRES_USER=airflow
+            - POSTGRES_PASSWORD=airflow
+            - POSTGRES_DB=airflow
+        ports:
+            - "5432:5432"
+        networks:
+            airflow-net:
+              aliases:
+                - net-postgres
+        healthcheck:
+            test: ["CMD-SHELL", "pg_isready -U airflow"]
+            interval: 10s
+            timeout: 5s
+            retries: 5
+    airflow:
+        container_name: airflow_webserver${AIRFLOW_VERSION}
+        build: 
+            context: .
+            args: 
+                AIRFLOW_DEPS: "[postgres]"
+                PIP_PKGS_EXT: "pyndv"
+        restart: always
+        depends_on:
+            - postgres
+        volumes:
+            - ${DAGS_FOLDER}:/usr/local/airflow/dags
+            - ${PLUGINS_FOLDER}:/usr/local/airflow/plugins
+        ports:
+            - "8080:8080"
+        command: webserver 
+        networks:
+            airflow-net:
+              aliases:
+                - net-airflow
+        healthcheck:
+            test: ["CMD-SHELL", "[ -f /usr/local/airflow/airflow-webserver.pid ]"]
+            interval: 30s
+            timeout: 60s
+            retries: 3
+networks:
+    airflow-net:
+        driver: bridge

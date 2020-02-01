@@ -1,0 +1,21 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "up-airflow-sandbox",
+            "type": "python",
+            "request": "launch",
+            "args": ["up"],
+            "program": "${workspaceFolder}/main.py",
+            "preLaunchTask": "up-airflow"
+        },
+        {
+            "name": "down-airflow-sandbox",
+            "type": "python",
+            "request": "launch",
+            "args": ["down"],
+            "program": "${workspaceFolder}/main.py",
+            "preLaunchTask": "down-airflow"
+        }
+    ],
+}
