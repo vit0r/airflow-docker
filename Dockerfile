@@ -22,12 +22,9 @@ ENV GOOGLE_APPLICATION_CREDENTIALS=${GCLOUD_CONFIGS}/gcloud/application_default_
 
 ARG DAGS_FOLDER
 ARG PLUGINS_FOLDER
-ARG AIRFLOW_VERSION
 ARG AIRFLOW_DEPS
 ARG PIP_PKGS_EXT
 ARG GCLOUD_INSTALL
-
-ENV AIRFLOW_VERSION_NUMBER=${AIRFLOW_VERSION}
 
 RUN useradd -ms /bin/bash -d ${AIRFLOW_HOME} airflow
 
@@ -73,6 +70,10 @@ RUN set -ex \
 RUN pip install --no-cache -U pip setuptools wheel
 
 RUN pip install --no-cache pytz pyOpenSSL ndg-httpsclient pyasn1 psycopg2-binary
+
+ARG AIRFLOW_VERSION
+
+ENV AIRFLOW_VERSION_NUMBER=${AIRFLOW_VERSION}
 
 RUN pip install --no-cache apache-airflow${AIRFLOW_DEPS}==${AIRFLOW_VERSION} ${PIP_PKGS_EXT}
 
