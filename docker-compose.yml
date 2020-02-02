@@ -24,7 +24,7 @@ services:
             context: .
             args: 
                 #AIRFLOW_DEPS: "[postgres]"
-                PIP_PKGS_EXT: "pyndv"
+                PIP_PKGS_EXT: "pyndv pymongo dnspython"
         restart: always
         depends_on:
             - postgres
