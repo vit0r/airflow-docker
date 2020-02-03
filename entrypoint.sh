@@ -12,7 +12,10 @@ case "$1" in
     wrapper_flask1103
     install_gcloud_sdk
     airflow initdb
-    airflow scheduler &
+    airflow worker -q pyndv_feed_q1 &
+    airflow worker -q pyndv_feed_q2 &
+    airflow flower &
+    airflow scheduler -p &
     exec airflow webserver
     ;;
   version)

@@ -19,7 +19,7 @@
     {
       "label": "up-airflow",
       "type": "shell",
-      "command": "AIRFLOW_VERSION=${input:version} DAGS_FOLDER=${input:dagsFolder} PLUGINS_FOLDER=${input:pluginsFolder} docker-compose -f docker-compose.yml up -d --no-build --force-recreate",
+      "command": "AIRFLOW_VERSION=${input:version} DAGS_FOLDER=${input:dagsFolder} PLUGINS_FOLDER=${input:pluginsFolder} docker-compose -f docker-compose.yml up --no-build --force-recreate",
       "dependsOn": [
         "down-airflow",
         "rm-postgres",
@@ -70,12 +70,19 @@
       "id": "dagsFolder",
       "description": "Dags folder:",
       "type": "pickString",
-      "options": []
+      "options": [
+        "/home/vit0r/.local/share/Trash/files/dags",
+        "/home/vit0r/Downloads/google-cloud-sdk/lib/surface/composer/environments/storage/dags",
+        "/home/vit0r/Downloads/google-cloud-sdk/.install/.backup/lib/surface/composer/environments/storage/dags",
+        "/home/vit0r/Tests/docker-airflow/dags",
+        "/home/vit0r/Projects/airflow-dags/dags",
+        "/home/vit0r/Projects/airflow-local/python_operator_dags/dags"
+      ]
     },
     {
       "id": "pluginsFolder",
       "description": "Plugins folder:",
-      "default": "",
+      "default": "/home/vit0r/airflow-plugins",
       "type": "promptString"
     }
   ]

@@ -18,21 +18,49 @@ services:
             interval: 10s
             timeout: 5s
             retries: 5
+    
+    rabbitmq01:
+        hostname: rabbitmq01
+        container_name: rabbitmq01
+        image: "rabbitmq:3-management"
+        environment: 
+            - RABBITMQ_DEFAULT_USER=guest
+            - RABBITMQ_DEFAULT_PASS=guest
+        ports:
+            - "5672:5672"
+            - "15672:15672"
+        volumes:
+            - 'rabbitmq_data:/data'
+        networks: 
+            airflow-net:
+                aliases: 
+                    - rabbitmq01_net
+    
     airflow:
-        container_name: airflow_webserver${AIRFLOW_VERSION}
+        container_name: webserver${AIRFLOW_VERSION}
         build: 
             context: .
             args: 
-                #AIRFLOW_DEPS: "[postgres]"
-                PIP_PKGS_EXT: "pyndv pymongo dnspython"
+                AIRFLOW_DEPS: "[celery,rabbitmq,crypto,jdbc]"
+                PIP_PKGS_EXT: "pyndv pymongo dnspython"                
         restart: always
+        environment: 
+            - AIRFLOW__CORE__EXECUTOR=CeleryExecutor
+            - AIRFLOW__CELERY__WORKER_CONCURRENCY=10
+            - AIRFLOW__CORE__LOAD_EXAMPLES=False
+            - AIRFLOW__CORE__REMOTE_LOGGING=False
+            - AIRFLOW__SCHEDULER_CATCHUP_BY_DEFAULT=False
+
         depends_on:
             - postgres
+            - rabbitmq01
         volumes:
             - ${DAGS_FOLDER}:/usr/local/airflow/dags
             - ${PLUGINS_FOLDER}:/usr/local/airflow/plugins
         ports:
             - "8080:8080"
+            - "5555:5555"
+            - "8793:8793"
         command: webserver 
         networks:
             airflow-net:
@@ -43,6 +71,10 @@ services:
             interval: 30s
             timeout: 60s
             retries: 3
+
+volumes:
+  rabbitmq_data:
+
 networks:
     airflow-net:
         driver: bridge

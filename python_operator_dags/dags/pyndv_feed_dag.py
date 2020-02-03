@@ -20,10 +20,11 @@ args = {
     "email_on_retry": False,
     "retries": 1,
     "retry_delay": timedelta(minutes=5),
+    'depends_on_past': False
 }
 
 dag = DAG(
-    dag_id="pyndv_feed", default_args=args, schedule_interval="@daily", catchup=False
+    dag_id="pyndv_feed", default_args=args, schedule_interval="@daily", catchup=False,concurrency=2, max_active_runs=2
 )
 
 
@@ -35,7 +36,11 @@ def pyndv_download():
 
 
 download_feed = PythonOperator(
-    task_id="pyndv_download_feed", python_callable=pyndv_download, dag=dag
+    task_id="pyndv_download_feed",
+    python_callable=pyndv_download,
+    queue='pyndv_feed_q1',
+    provide_context=True,
+    dag=dag
 )
 
 
@@ -85,7 +90,8 @@ write_feed = PythonOperator(
     on_failure_callback=write_failure_callback,
     on_retry_callback=write_retry_callback,
     on_success_callback=write_success_callback,
-    wait_for_downstream=True,
+    queue='pyndv_feed_q2',
+    provide_context=True,
     dag=dag,
 )
 
