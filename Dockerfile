@@ -6,15 +6,9 @@ ENV LANG en_US.UTF-8
 ENV LC_ALL en_US.UTF-8
 ENV LC_CTYPE en_US.UTF-8
 ENV LC_MESSAGES en_US.UTF-8
-
 ENV SLUGIFY_USES_TEXT_UNIDECODE=yes
 ENV AIRFLOW_GPL_UNIDECODE=yes
-ENV AIRFLOW__CORE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:airflow@postgres-airflow:5432/airflow
-ENV AIRFLOW__CORE__EXECUTOR=LocalExecutor
-ENV AIRFLOW_HOME=/usr/local/airflow
-
 ENV GCLOUD_CONFIGS=${AIRFLOW_HOME}/.config
-ENV GOOGLE_APPLICATION_CREDENTIALS=${GCLOUD_CONFIGS}/gcloud/application_default_credentials.json
 
 RUN useradd -ms /bin/bash -d ${AIRFLOW_HOME} airflow
 
@@ -59,16 +53,11 @@ RUN set -ex \
 
 RUN pip install --no-cache -U pip pytz wheel pyOpenSSL ndg-httpsclient pyasn1 psycopg2-binary 
 
-ARG AIRFLOW_VERSION
-ARG DAGS_FOLDER
-ARG PLUGINS_FOLDER
 ARG AIRFLOW_DEPS
 ARG PIP_PKGS_EXT
 ARG GCLOUD_INSTALL
 
-ENV AIRFLOW_VERSION_NUMBER=${AIRFLOW_VERSION}
-
-RUN pip install --no-cache apache-airflow${AIRFLOW_DEPS}==${AIRFLOW_VERSION} ${PIP_PKGS_EXT}
+RUN pip install --no-cache apache-airflow${AIRFLOW_DEPS}==${AIRFLOW_VERSION_NUMBER} ${PIP_PKGS_EXT}
 
 ADD ./entrypoint.sh /entrypoint.sh
 

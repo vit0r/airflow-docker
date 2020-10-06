@@ -75,7 +75,7 @@
       "id": "dagsFolder",
       "description": "Dags folder:",
       "default": "",
-      "type": "promptString"
+      "type": "promptString",
     },
     {
       "id": "pluginsFolder",

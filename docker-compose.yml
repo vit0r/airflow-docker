@@ -20,23 +20,28 @@ services:
             timeout: 5s
             retries: 5
     airflow:
-        container_name: webserver${AIRFLOW_VERSION}
-        hostname: webserver${AIRFLOW_VERSION}
+        container_name: webserver-airflow
+        hostname: webserver-airflow
         build: 
             context: .
             args: 
                 AIRFLOW_DEPS: "[jdbc]"
-                PIP_PKGS_EXT: "pyndv pymongo dnspython"
+                PIP_PKGS_EXT: "pyndv pymongo dnspython"                
         environment: 
-            - AIRFLOW__CORE__LOAD_EXAMPLES=False
+            - AIRFLOW__CORE__LOAD_EXAMPLES=True
             - AIRFLOW__CORE__REMOTE_LOGGING=False
             - AIRFLOW__SCHEDULER__CATCHUP_BY_DEFAULT=False
+            - AIRFLOW__CORE__EXECUTOR=LocalExecutor
+            - AIRFLOW_HOME=/usr/local/airflow
+            - AIRFLOW__CORE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:airflow@postgres-airflow:5432/airflow
+            - GOOGLE_APPLICATION_CREDENTIALS=${GCLOUD_CONFIGS}/gcloud/application_default_credentials.json
+            - AIRFLOW_VERSION_NUMBER=1.10.12
         restart: always
         depends_on:
             - postgres_airflow
         volumes:
-            - ${DAGS_FOLDER}:/usr/local/airflow/dags
-            - ${PLUGINS_FOLDER}:/usr/local/airflow/plugins
+            - ./dags:/usr/local/airflow/dags
+            - ./plugins:/usr/local/airflow/plugins
         ports:
             - "8080:8080"
         command: webserver 

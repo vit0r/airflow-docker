@@ -48,7 +48,7 @@ def update_input_options(
 
 if __name__ == "__main__":
     try:
-        update_input_options("**/dags", "dagsFolder", "options")
+        update_input_options("**/dags", "dagsFolder", "default")
         update_input_options("**/airflow-plugins", "pluginsFolder")
         sys.exit(0)
     except ValueError as ex:
